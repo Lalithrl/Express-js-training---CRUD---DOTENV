@@ -1,5 +1,5 @@
 import express from "express";
-import { client } from "../index.js";
+import { getAllMovies, getMovieById, createMovies, deleteMovieById, updateMovieById } from "../services/movies.service.js";
 const router = express.Router();
 
 /* /movies - Display all movie data  */
@@ -15,10 +15,7 @@ router.get("/", async function (request, response) {
     console.log(request.query);
   
     //cursor -> pagination | toArray
-    const movies = await client
-    .db("training")
-    .collection("movies")
-    .find(request.query).toArray();
+    const movies = await getAllMovies(request);
     response.send(movies);
   });
   
@@ -30,10 +27,7 @@ router.get("/", async function (request, response) {
   
     console.log(id);
     // const movie = movies.find((mv) => mv.id == id);
-    const movie = await client
-      .db("training")
-      .collection("movies")
-      .findOne({ id: id });
+    const movie = await getMovieById(id);
     console.log(movie);
     movie
       ? response.send(movie)
@@ -45,7 +39,7 @@ router.get("/", async function (request, response) {
     // console.log(data);
     // db.movies.insertMany(data)
   
-    const result = await client.db("training").collection("movies").insertMany(data);
+    const result = await createMovies(data);
   
     response.send(result);
   });
@@ -57,10 +51,7 @@ router.get("/", async function (request, response) {
     // db.movies.deleteOne({id: "101"})
   
     console.log(id);
-    const result = await client
-      .db("training")
-      .collection("movies")
-      .deleteOne({ id: id });
+    const result = await deleteMovieById(id);
     console.log(result);
     result.deletedCount > 0
       ? response.send({ msg : "Movie was deleted successfully" })
@@ -77,10 +68,7 @@ router.get("/", async function (request, response) {
   
     console.log(id);
     // const movie = movies.find((mv) => mv.id == id);
-    const result = await client
-      .db("training")
-      .collection("movies")
-      .updateOne({id: id}, { $set: data });
+    const result = await updateMovieById(id, data);
     console.log(result);
     result
       ? response.send(result)
@@ -88,4 +76,4 @@ router.get("/", async function (request, response) {
   });
 
   export default router;
-  
+
